@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container pt-5 border">
+  <br/>
+  <h2 class="text-center">Import Chassis</h2>
+  <br/>
+  <div class="row ">
+    <div class="col-2  m-1 ">
+      <h4>Name:</h4>
+      <h4>Description:</h4>
+    </div>
+    <div class="col-7  m-1 ">
+      <h4>{{ project.name }}</h4>
+      <h4>{{ project.description }}</h4>
+    </div>
+    </div
+
+    <div>
+      <form method="POST" action="{% url 'project/importChassis' project.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row m-1">
+          <div class="col-2 text-right">
+            Chassis Name:
+          </div>
+          <div class="col-4">
+            <input type="text" id="chassisName" name="chassisName" /><br/>
+          </div>
+        </div>
+        <div class="row m-1">
+          <div class="col-2 text-right">
+            Parent Module:
+          </div>
+          <div class='col-4'>
+            <select class="form-control" id="parentModule" name="parentModule">
+              <option>Local</option>
+              {% for parent in parents.all %}
+              <option> {{parent.name}} {{parent.catalogNumber}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <br/><br/>
+        <input type="file" id="inputFile" name="inputFile" /><br/><br/>
+        <input type="submit" value="Import File" class="btn btn-primary"/>
+      </form>
+    </div>
+
+    <div class="text-center text-danger">
+      <h4>
+        {% if error %}
+        {{ error }}
+        <br/><br/>
+        {% endif %}
+      </h2>
+    </div>
+
+  </div>
+
+
+
+
+
+  {% endblock %}

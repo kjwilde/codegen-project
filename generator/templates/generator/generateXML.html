@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+  {{ error }}
+  <br/><br/>
+{% endif %}
+
+<div class="container pt-5 border">
+  <br/>
+  <h2 class="text-center">Generate XML</h2>
+  <h3>{{project.name}}</h3>
+  <br/>
+  <form method="POST" action="{% url 'project/generateXML' project.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" id="outputFile" name="outputFile" /><br/><br/>
+    <input type="submit" value="Target Location" class="btn btn-primary"/>
+  </form>
+  <p>
+    {{ message }}
+  </p>
+
+</div>
+
+{% endblock %}

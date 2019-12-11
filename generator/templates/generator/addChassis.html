@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+  {{ error }}
+  <br/><br/>
+{% endif %}
+
+<div class="container pt-5">
+  <br/>
+  <h2 class="text-center">Add Chassis</h2>
+  <br/>
+
+  <div >
+
+    <div class="row">
+      <div class="col-10 border">
+        <p class="text-lg-center font-weight-bold">Filters</p>
+        <!-- Filter Form -->
+        <form class="form-inline" method="GET" action="{% url 'project/addChassis' project.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group p-2">
+            <label for="type" class="font-weight-bold pr-2">Select Type:  </label><br/>
+            <select class="form-control" id="seriesFilter" name="seriesFilter">
+                <option></option>
+                {% for s in series %}
+                  <option>{{s}}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <label for="catalogNumber" class="font-weight-bold pr-2">Catalog Number:  </label>
+          <input type="text" class="form-control" id="catalogFilter" name="catalogFilter">
+          <div class="form-group p-2">
+            <input type="submit" value="Filter" class="btn btn-primary"/>
+          </div>
+        </form>
+
+      </div>
+      <div class="col-2">
+            <br/>
+            <a href="#" class="btn btn-primary btn-block" >Cancel</a>
+
+      </div>
+    </div>
+</div>
+  <br/>
+  <div class="row" >
+    <div class="col-12">
+      <form method="POST" action="{% url 'project/addChassis' project.id chass.catalogNumber %}" enctype="multipart/form-data">
+      <!-- Reserve most space for table -->
+      <table class="table table-bordered table-striped " width="100%">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Catalog Number</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for chass in chassis.all %}
+            <tr>
+              <form method="POST" action="{% url 'project/addChassis' project.id chass.catalogNumber %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <td>{{chass.catalogNumber}}</td>
+                <td>{{chass.description}}</td>
+                <td>{{chass.size}}</td>
+                <td><input type="submit" value="Select" class="btn btn-primary"/></td>
+              </form>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}

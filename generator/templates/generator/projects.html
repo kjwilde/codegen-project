@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+<div class="container pt-5">
+  <br/>
+  <h2 class="text-center">Projects</h2>
+  <br/>
+  <div class="row">
+    <div class="col-10">
+      <!-- Reserve most space for table -->
+      <table class="table table-bordered table-striped ">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Owner</th>
+            <th>Created On</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for project in projects.all %}
+        <tr>
+          <td>{{project.id}}</td>
+          <td>{{project.name}}</td>
+          <td>{{project.description}}</td>
+          <td>{{project.createdBy}}</td>
+          <td>{{project.createdOn}}</td>
+          <!-- <td><button type="button" class="btn btn-info btn-block" >Edit</button></td> -->
+          <td><a href="{% url 'editProject' project.id %}" class="btn btn-info btn-block" role="button">Edit</a></td>
+          <td><a href="{% url 'deleteProject' project.id %}" class="btn btn-info btn-block" role="button">Delete</a></td>
+        </tr>
+
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class='col-2'>
+      <!-- Controls -->
+      <a href="{% url 'createProject' %}" class="btn btn-primary btn-block" role="button">Create New</a>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

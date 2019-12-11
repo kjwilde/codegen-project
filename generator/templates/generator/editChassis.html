@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+  {{ error }}
+  <br/><br/>
+{% endif %}
+
+<div class="container pt-5">
+  <br/>
+  <h2 class="text-center">Chassis Details</h2>
+  <br/>
+  <div class="row pb-2">
+    <div class="col-2 text-right">
+      <h5>Name:</h5>
+    </div>
+    <div class="col-8">
+      <h5>{{chassis.name}}</h5>
+    </div>
+    <div class="col-2">
+      <a href="{% url 'chassis/addModule' chassis.id %}" class="btn btn-primary btn-block">Add Module</a>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-10">
+      <!-- Reserve most space for table -->
+      <table class="table table-bordered table-striped ">
+        <thead>
+          <tr>
+            <th>Slot</th>
+            <th>Module Name</th>
+            <th>Catalog Number</th>
+            <th>Parent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for module in modules %}
+          <tr>
+            <td>{{module.slot}}</td>
+            <td>{{module.name}}</td>
+            <td>{{module.catalogNumber}}</td>
+            <td>{{module.parent}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+  {{ error }}
+  <br/><br/>
+{% endif %}
+
+<div class="container pt-5">
+  <br/>
+  <h2 class="text-center">Project Details</h2>
+  <br/>
+  <div class="row pb-2">
+    <div class="col-2 text-right">
+      <h5>Name:</h5>
+    </div>
+    <div class="col-8">
+      <h5>{{project.name}}</h5>
+    </div>
+    <div class="col-2">
+      <a href="{% url 'project/importChassis' project.id %}" class="btn btn-primary btn-block" role="button">Import</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 text-right">
+      <h5>Description:</h5>
+    </div>
+    <div class="col-8">
+      <h5>{{project.description}}</h5>
+    </div>
+    <div class="col-2">
+      <a href="{% url 'project/generateXML' project.id %}" class="btn btn-primary btn-block" role="button">Generate</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-10">
+      <!-- Reserve most space for table -->
+      <table class="table table-bordered table-striped ">
+        <thead>
+          <tr>
+            <th>Chassis ID</th>
+            <th>Name</th>
+            <th>Catalog</th>
+            <th>Slots</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for chass in chassis.all %}
+          <tr>
+            <td>{{chass.id}}</td>
+            <td>{{chass.name}}</td>
+            <td>{{chass.catalogId.catalogNumber}}</td>
+            <td>{{chass.catalogId.size}}</td>
+            <td><a href="{% url 'chassis/editChassis' chass.id %}" class="btn btn-info btn-block" role="button">Edit</a></td>
+            <!-- <td></td> -->
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

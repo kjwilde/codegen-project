@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if error %}
+  {{ error }}
+  <br/><br/>
+{% endif %}
+
+<div class="container pt-5 border">
+  <br/>
+  <h2 class="text-center">Import Results</h2>
+  <br/>
+  <p>
+    {{ message }}
+  </p>
+
+</div>
+
+
+
+
+
+{% endblock %}
