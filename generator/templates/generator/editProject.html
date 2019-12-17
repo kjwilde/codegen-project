@@ -43,6 +43,7 @@
             <th>Catalog</th>
             <th>Slots</th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -53,6 +54,7 @@
             <td>{{chass.catalogId.catalogNumber}}</td>
             <td>{{chass.catalogId.size}}</td>
             <td><a href="{% url 'chassis/editChassis' chass.id %}" class="btn btn-info btn-block" role="button">Edit</a></td>
+            <td><a href="{% url 'deleteChassis' chass.id %}" class="btn btn-info btn-block" role="button">Delete</a></td>
             <!-- <td></td> -->
           </tr>
 

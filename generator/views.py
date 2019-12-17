@@ -32,9 +32,9 @@ def createProject(request):
         return render(request,'generator/createProject.html')
 
 def editProject(request,projectId):
-        project = Project.objects.get(id=projectId)
-        chassis = ProjChassis.objects.filter(projId=project.id)
-        return render(request,'generator/editProject.html',{'project':project,'chassis':chassis})
+    project = Project.objects.get(id=projectId)
+    chassis = ProjChassis.objects.filter(projId=project.id)
+    return render(request,'generator/editProject.html',{'project':project,'chassis':chassis})
 
 def deleteProject(request,projectId):
     project = Project.objects.get(id=projectId)
@@ -52,10 +52,19 @@ def editChassis(request,chassisId):
     #    except IndexError:
     #        moduleCatalogNumbers.append('')
 
-
-
     params = {'chassis':chassis,'modules':modules}
     return render(request,'generator/editChassis.html',params)
+
+
+def deleteChassis(request,chassisId):
+    chassis = ProjChassis.objects.get(id=chassisId)
+    projectId = chassis.projId.id
+    chassis.delete()
+    project = Project.objects.get(id=projectId)
+    #return render(request,'generator/editProject.html',{'project':project})
+    return redirect('/generator/' + str(projectId))
+
+
 
 def addChassis(request,projectId,catalogNumber=None):
     '''
@@ -215,23 +224,25 @@ def importChassis(request,projectId):
                     newModule.slot = i
                     newModule.save()
 
-            params = {'message':'Import Complete '}
-            return render(request,'generator/importChassisResults.html',params)
-            ################
-            # determine chassis type and size...
-            #params = {'error':series}
-            return redirect('/generator/project/importChassisResults/')
+            return redirect('/generator/project/importChassisResults/' + str(newChassis.id))
+
 
     elif request.method == 'GET':
-
-
-        mods = ProjModule.objects.filter(projId=projectId).filter(moduleId__type='Communications')
+        filter = {'moduleId__type':'Communications','moduleId__series':'1756'}
+        mods = ProjModule.objects.filter(projId=projectId).filter(**filter)
 
         params = {'project':project,'parents':mods}
         return render(request,'generator/importChassis.html',params)
 
-def importChassisResults(request):
-    return render(request,'generator/importChassisResults.html')
+def importChassisResults(request,chassisId):
+
+    chassis = ProjChassis.objects.get(id=chassisId)
+    project = Project.objects.get(id=chassis.projId.id)
+    modules = ProjModule.objects.filter(chassisId=chassis.id).order_by('slot')
+    # TODO:  parent chassis should probably be a property ProjChassis
+    parentChassis = modules[0].parent
+    params = {'project':project,'chassis':chassis,'modules':modules,'parentChassis':parentChassis}
+    return render(request,'generator/importChassisResults.html',params)
 
 def generateXML(request,projectId):
     import xml.etree.ElementTree as ET
