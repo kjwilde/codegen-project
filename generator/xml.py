@@ -31,17 +31,10 @@ def buildXML(project):
     modules.append(module)
     #local Modules
     localModules = ProjModule.objects.filter(projId=projId).filter(parent='Local')
-    # TODO: This is temp just for testing, should come from props
-    ipAddress = '192.168.1.1'
     for module in localModules:
         if module.moduleId.type != 'Processor':
             #m =  getModuleXml(catalogNumber=module['catalogNumber'],moduleName=module['moduleName'],slotNumber=module['slot'])
-            # TODO: This is temp just for testing, should come from props
-            if module.moduleId.type == 'Communications':
-                m =  getModuleXml(module.moduleId.catalogNumber,moduleName=module.name,slotNumber=module.slot,ipAddress=ipAddress)
-                ipAddress = incrementIp(ipAddress)
-            else:
-                m =  getModuleXml(module.moduleId.catalogNumber,moduleName=module.name,slotNumber=module.slot)
+            m =  getModuleXml(module.moduleId.catalogNumber,moduleName=module.name,slotNumber=module.slot)
             modules.append(m)
     # child modules.
     filter = {'projId__exact':projId}
@@ -50,22 +43,11 @@ def buildXML(project):
         # TODO make this more flexible
         if module.moduleId.catalogNumber == '1734-AENT':
             chassisSize = module.chassisId.catalogId.size
-            m =  getModuleChassisXML(catalogNumber=module.moduleId.catalogNumber,moduleName=module.name,parentModule=module.parent,slotNumber=module.slot,chassisSize=chassisSize,ipAddress=ipAddress,isEthernet=True)
-            ipAddress = incrementIp(ipAddress)
+            m =  getModuleChassisXML(catalogNumber=module.moduleId.catalogNumber,moduleName=module.name,parentModule=module.parent,slotNumber=module.slot,chassisSize=chassisSize)
         else:
             m =  getModuleXml(catalogNumber=module.moduleId.catalogNumber,moduleName=module.name,slotNumber=module.slot,parentModule=module.parent)
         modules.append(m)
     return root
-
-def incrementIp(ipAddress):
-    '''
-        Increment the ip address by 1 and return it
-    '''
-    octets = ipAddress.split('.')
-    n = int(octets[3]) + 1
-    octets[3] = str(n)
-    ipAddress = '.'.join(octets)
-    return ipAddress
 
 def getModuleXml(catalogNumber,moduleName,slotNumber,isEthernet=False,ipAddress=None,parentModule='Local',chassisSize=None):
 	'''
