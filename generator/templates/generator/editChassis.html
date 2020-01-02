@@ -15,18 +15,34 @@
   <br/>
   <h2 class="text-center">Chassis Details</h2>
   <br/>
-  <div class="row pb-2">
+    <div class="row pb-2">
+      <div class="col-2 text-right">
+        <h5>Name:</h5>
+      </div>
+      <div class="col-8">
+        <h5>{{chassis.name}}</h5>
+      </div>
+      <div class="col-2">
+        <a href="{% url 'chassis/addModule' chassis.id %}" class="btn btn-primary btn-block">Add Module</a>
+      </div>
+    </div>
+  <!-- PARENT DROPDOWN -->
+  <div class="row">
     <div class="col-2 text-right">
-      <h5>Name:</h5>
+        <h5>Parent</h5>
     </div>
-    <div class="col-8">
-      <h5>{{chassis.name}}</h5>
-    </div>
-    <div class="col-2">
-      <a href="{% url 'chassis/addModule' chassis.id %}" class="btn btn-primary btn-block">Add Module</a>
+    <div class="col-4">
+      <select class="form-control" id="parentModule" name="parentModule">
+        <option>{{ parentModule}}</option>
+        <option><div class="dropdown-divider"></div></option>
+        <option>Local</option>
+        {% for parent in parents.all %}
+          <option> {{parent.name}} {{parent.catalogNumber}}</option>
+        {% endfor %}
+      </select>
     </div>
   </div>
-
+  </br>
 
   <div class="row">
     <div class="col-10">

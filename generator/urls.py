@@ -7,7 +7,9 @@ urlpatterns = [
                 path('createProject', views.createProject, name='createProject'),
                 path('deleteProject/<int:projectId>',views.deleteProject,name='deleteProject'),
                 path('deleteChassis/<int:chassisId>',views.deleteChassis,name='deleteChassis'),
-                path('<int:projectId>',views.editProject,name='editProject'),
+
+                path('project/<int:projectId>',views.editProject,name='projects/editProject'),
+
                 path('chassis/<int:chassisId>',views.editChassis,name='chassis/editChassis'),
                 path('chassis/addModule/<int:chassisId>',views.addModule,name='chassis/addModule'),
                 path('chassis/addModule/<int:chassisId>/<slug:catalogNumber>',views.addModule,name='chassis/addModule'),

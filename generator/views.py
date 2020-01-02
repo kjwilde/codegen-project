@@ -4,7 +4,7 @@ from .models import *
 from django.utils import timezone
 from django.db import IntegrityError
 from django.http import HttpResponse
-from .util import parseAutoGenImport,prettify
+from .util import parseAutoGenImport,prettify,parseAutoGenInportComments
 from .xml import buildXML
 
 
@@ -44,15 +44,13 @@ def deleteProject(request,projectId):
 def editChassis(request,chassisId):
     chassis = ProjChassis.objects.get(id=chassisId)
     modules = ProjModule.objects.filter(chassisId=chassis.id).order_by('slot')
-    #size = chassis.chassisId.size
-    #moduleCatalogNumbers = []
-    #for i in range(size):
-    #    try:
-    #        moduleCatalogNumbers.append(modules[i].catalogId.catalogNumber)
-    #    except IndexError:
-    #        moduleCatalogNumbers.append('')
+    projectId = chassis.projId
 
-    params = {'chassis':chassis,'modules':modules}
+    # TODO: Make this more graceful
+    filter = {'moduleId__type__type':'Communications','moduleId__series':'1756'}
+    parentMods = ProjModule.objects.filter(projId=projectId).filter(**filter)
+    parentMod = modules.get(slot=0).parent
+    params = {'chassis':chassis,'modules':modules,'parents':parentMods,'parentModule':parentMod}
     return render(request,'generator/editChassis.html',params)
 
 
@@ -62,9 +60,7 @@ def deleteChassis(request,chassisId):
     chassis.delete()
     project = Project.objects.get(id=projectId)
     #return render(request,'generator/editProject.html',{'project':project})
-    return redirect('/generator/' + str(projectId))
-
-
+    return redirect('/generator/project/' + str(projectId))
 
 def addChassis(request,projectId,catalogNumber=None):
     '''
@@ -109,7 +105,6 @@ def addModule(request,chassisId,catalogNumber=None):
         newModule = ProjModule()
         newModule.projId = chassis.projId
         newModule.chassisId = ProjChassis.objects.get(id=chassis.chassisId.id)
-
 
         newModule.slot = 0
         newModule.catalogId = Module.objects.get(catalogNumber=catalogNumber)
@@ -170,9 +165,17 @@ def importChassis(request,projectId):
             newChassis = ProjChassis()
             newChassis.projId = Project.objects.get(id=projectId)
             newChassis.name = chassisName
+            if request.POST['parentModule'] == 'Local':
+                newChassis.parent = 'Local'
+            else:
+                pmLst = request.POST['parentModule'].split(' ')
+                newChassis.parent = pmLst[0]
             newChassis.save()
             newChassisId = ProjChassis.objects.get(name=chassisName).id
-            importData = parseAutoGenImport(file)
+
+            # decode the file data and parse it
+            fileData = file.read().decode('utf-8')
+            importData = parseAutoGenImport(fileData)
             modCount = 0
             chassisParent = ''
             for i in range(1,len(importData)):
@@ -200,8 +203,14 @@ def importChassis(request,projectId):
                         chassisParent = newModule.name
                     else:
                         newModule.parent=chassisParent
-
                 newModule.save()
+
+                # get the comments of any module that has 'points'
+                if newModule.moduleId.points is not None:
+                    comments = parseAutoGenInportComments(fileData,newModule.slot,newModule.moduleId.points)
+                    newModule.comments = comments
+                newModule.save()
+
                 modCount += 1
                 series = newModule.catalogNumber[:4]
             ###############################################
@@ -228,7 +237,7 @@ def importChassis(request,projectId):
 
 
     elif request.method == 'GET':
-        filter = {'moduleId__type':'Communications','moduleId__series':'1756'}
+        filter = {'moduleId__type__type':'Communications','moduleId__series':'1756'}
         mods = ProjModule.objects.filter(projId=projectId).filter(**filter)
 
         params = {'project':project,'parents':mods}
@@ -253,7 +262,8 @@ def generateXML(request,projectId):
     project = Project.objects.get(id=projectId)
     xml = buildXML(project)
     output = prettify(xml)
-    fileName = project.name + '.xml'
+    # replace spaces 'cuz it makes RsLogix grumpy
+    fileName = project.name.replace(' ','_') + '.xml'
     response = HttpResponse(output,content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + fileName
 
